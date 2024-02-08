@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS public.imagery
+(
+    gid integer NOT NULL DEFAULT nextval('imagery_gid_seq'::regclass),
+    dt integer,
+    panoramaid text COLLATE pg_catalog."default",
+    lat numeric,
+    "long" numeric,
+    elevation integer,
+    description text COLLATE pg_catalog."default",
+    lang character(10) COLLATE pg_catalog."default",
+    conf numeric,
+    ts timestamp without time zone
+)
+
+CREATE TABLE IF NOT EXISTS public.allimages
+(
+    id integer NOT NULL DEFAULT nextval('allimages_id_seq'::regclass),
+    fullname text COLLATE pg_catalog."default",
+    panoramaid text COLLATE pg_catalog."default",
+    ts timestamp without time zone
+)
