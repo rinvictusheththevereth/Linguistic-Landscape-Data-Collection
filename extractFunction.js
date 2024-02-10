@@ -9,6 +9,19 @@ const client = new vision.ImageAnnotatorClient({
     keyFilename: keyFilename
 });
 
+const listFoldersInBucket = async (bucketName) => {
+    const options = {
+        autoPaginate: false,
+        delimiter: '/',
+        prefix: '',
+    };
+
+    const [files, nextQuery, apiResponse] = await storage.bucket(bucketName).getFiles(options);
+    const folders = apiResponse.prefixes;
+
+    return folders;
+}
+
 const listAllFilesInBuckets = async (bucketName) => {
     const [files] = await storage.bucket(bucketName).getFiles();
     console.log('Files:');
@@ -127,6 +140,7 @@ module.exports = {
     insertFullName,
     readLocalImages,
     readBucketImages,
+    listFoldersInBucket,
     listAllFilesInBuckets,
     listFilesInSpecificFolder
 };
