@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-const { readImages } = require('./extractFunction')
+const { readLocalImages, readBucketImages, listAllFilesInBuckets, listFilesInSpecificFolder } = require('./extractFunction')
 const { validateResult } = require('./database')
 
 // get data from database
@@ -26,7 +26,11 @@ app.get('/', async (req, res) => {
 })
 
 // insert folder name here
-// readImages('./test_images');
+// listAllFilesInBuckets('imagery-kyiv-pelagic-radio-355403/TEST_FOLDER');
+// listFilesInSpecificFolder('imagery-kyiv-pelagic-radio-355403', 'TEST_FOLDER/');
+
+// readLocalImages('./test_images');
+readBucketImages('imagery-kyiv-pelagic-radio-355403', 'B/');
 
 const port = 3000
 app.listen(port, () => {
