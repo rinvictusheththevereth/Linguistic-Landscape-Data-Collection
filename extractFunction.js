@@ -124,8 +124,8 @@ const readBucketImages = async (bucketName, folderName) => {
                 const item = f.replace('.jpg', '');
                 const [dt, panoramaid, lat, long, elevation] = item.split(',');
                 const txtObj = { dt, panoramaid, lat, long, elevation };
-                // await insertFullName(item, panoramaid);
-                // await detectTextFromBucketImage(gcsUri, txtObj);
+                await insertFullName(item, panoramaid);
+                await detectTextFromBucketImage(gcsUri, txtObj);
                 console.log(i, txtObj);
                 i++;
             }

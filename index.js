@@ -53,7 +53,7 @@ app.use('/', express.static('www'))
 // listFilesInSpecificFolder(bucketName, 'TEST_FOLDER/');
 
 // readLocalImages('./test_images');
-// readBucketImages(bucketName, 'B/');
+readBucketImages(bucketName, 'B/');
 
 const port = 3000
 app.listen(port, () => {
