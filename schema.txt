@@ -9,8 +9,9 @@ CREATE TABLE IF NOT EXISTS public.imagery
     description text COLLATE pg_catalog."default",
     lang character(10) COLLATE pg_catalog."default",
     conf numeric,
-    ts timestamp without time zone
-)
+    ts timestamp without time zone,
+	foldername text
+);
 
 CREATE TABLE IF NOT EXISTS public.allimages
 (

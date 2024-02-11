@@ -10,22 +10,22 @@ const pool = new Pool({
 });
 
 const insertToDB = async (obj) => {
-    const sql = `INSERT INTO public.imagery(dt, panoramaid, lat, lng, elevation, description, lang, conf, ts)
-                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, now())`;
+    const sql = `INSERT INTO public.imagery(dt, panoramaid, lat, lng, elevation, description, lang, conf, foldername, ts)
+                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, now())`;
     const values = [
         obj.dt,
         obj.panoramaid,
         obj.lat,
-        obj.long,
+        obj.lng,
         obj.elevation,
         obj.txt,
         obj.languageCode,
-        obj.confidence || 0
+        obj.confidence || 0,
+        obj.foldername
     ];
 
     try {
         await pool.query(sql, values);
-        // console.log("Insert success!");
     } catch (error) {
         console.error("Insert failed:", error.message);
     }
@@ -59,8 +59,28 @@ const validateResult = (result) => {
     }
 };
 
+const resultDetectText = (folder) => {
+    const sql = `SELECT 
+        foldername,
+        panoramaid,
+        SUM(CASE WHEN lang = 'ru' THEN 1 ELSE 0 END) AS ru_count,
+        SUM(CASE WHEN lang = 'uk' THEN 1 ELSE 0 END) AS uk_count,
+        SUM(CASE WHEN lang NOT IN ('ru', 'uk') THEN 1 ELSE 0 END) AS other_count
+    FROM imagery
+    WHERE foldername = $1
+    GROUP BY foldername, panoramaid`;
+    const values = [folder];
+
+    try {
+        return pool.query(sql, values);
+    } catch (error) {
+        console.error("Get result failed:", error.message);
+    }
+};
+
 module.exports = {
     insertToDB,
     insertFullName,
-    validateResult
+    validateResult,
+    resultDetectText
 };

@@ -37,7 +37,7 @@ const listFilesInSpecificFolder = async (bucketName, folderName) => {
     };
 
     const [files] = await storage.bucket(bucketName).getFiles(options);
-
+    console.log(files.length);
     console.log(`Files in ${folderName}:`);
     files.forEach(file => {
         console.log(file.name);
@@ -99,8 +99,8 @@ const readLocalImages = async (path) => {
         for (const file of files) {
             if (file.endsWith('.jpg')) {
                 const item = file.replace('.jpg', '');
-                const [dt, panoramaid, lat, long, elevation] = item.split(',');
-                const txtObj = { dt, panoramaid, lat, long, elevation };
+                const [dt, panoramaid, lat, lng, elevation] = item.split(',');
+                const txtObj = { dt, panoramaid, lat, lng, elevation };
                 await insertFullName(item, panoramaid);
                 await detectTextFromLocalImage(`${path}/${file}`, txtObj);
                 console.log(i, txtObj);
@@ -113,28 +113,39 @@ const readLocalImages = async (path) => {
     }
 };
 
-const readBucketImages = async (bucketName, folderName) => {
+const readBucketImages = async (bucketName, foldername) => {
+    let processedImages = 0;
     try {
-        const [files] = await storage.bucket(bucketName).getFiles({ prefix: folderName });
-        let i = 1;
+        const [files] = await storage.bucket(bucketName).getFiles({ prefix: foldername });
+        const imageProcessingPromises = [];
         for (const file of files) {
             const gcsUri = `gs://${file.parent.name}/${file.name}`;
             if (file.name.endsWith('.jpg')) {
-                const f = file.name.replace(folderName, '');
+                const f = file.name.replace(foldername, '');
                 const item = f.replace('.jpg', '');
-                const [dt, panoramaid, lat, long, elevation] = item.split(',');
-                const txtObj = { dt, panoramaid, lat, long, elevation };
-                await insertFullName(item, panoramaid);
-                await detectTextFromBucketImage(gcsUri, txtObj);
-                console.log(i, txtObj);
-                i++;
+                const [dt, panoramaid, lat, lng, elevation] = item.split(',');
+                const txtObj = { dt, panoramaid, lat, lng, elevation, foldername };
+                imageProcessingPromises.push(detectTextFromBucketImage(gcsUri, txtObj));
+                console.log(`process: ${processedImages} of ${files.length}`);
+                processedImages++;
             }
         }
+        await Promise.all(imageProcessingPromises);
         console.log('finished reading images');
+        return { success: true, processedImages: processedImages, message: "Finished reading and processing images" };
     } catch (error) {
         console.error("Error reading images:", error);
     }
 };
+
+const numberOfFilesInFolder = async (bucketName, foldername) => {
+    try {
+        const [files] = await storage.bucket(bucketName).getFiles({ prefix: foldername });
+        return files.length;
+    } catch (error) {
+        console.error("Error reading images:", error);
+    }
+}
 
 module.exports = {
     insertFullName,
@@ -142,5 +153,6 @@ module.exports = {
     readBucketImages,
     listFoldersInBucket,
     listAllFilesInBuckets,
-    listFilesInSpecificFolder
+    listFilesInSpecificFolder,
+    numberOfFilesInFolder
 };
