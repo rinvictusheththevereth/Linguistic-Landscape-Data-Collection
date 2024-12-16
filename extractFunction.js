@@ -55,7 +55,7 @@ const detectTextFromLocalImage = async (imgfile, txtObj) => {
                     let txt = word.symbols.map(symbol => symbol.text).join('');
                     let languageCode = word.property?.detectedLanguages[0].languageCode || '';
                     let confidence = word.property?.detectedLanguages[0].confidence || 0;
-
+//filtering of watermarks is also done through SQL query. Filters available for this project. 
                     if (!["Google", "Ⓒ2020", "Ⓒ2022", "@", "©", "Googlo", "Goog", "ogle"].includes(txt)) {
                         let allData = { ...txtObj, txt, languageCode, confidence };
                         await insertToDB(allData);
