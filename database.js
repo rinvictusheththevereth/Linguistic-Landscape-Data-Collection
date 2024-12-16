@@ -3,9 +3,9 @@ const { Pool } = require('pg');
 // Consider moving sensitive information to environment variables
 const pool = new Pool({
     host: 'localhost',
-    database: 'langland',
-    user: 'sakdahomhuan',
-    password: '1234',
+    database: '********',
+    user: '********',
+    password: '********',
     port: '5432',
 });
 
